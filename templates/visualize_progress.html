@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualize Progress</title>
+    <script src="https://983fc266-c3f0-4e87-855a-db7a00197bee.plotly.app"></script>
+
+</head>
+<body>
+    <div class="bg-gray-300 py-8">
+        <div class="container mx-auto px-4">
+            <div class="header flex items-center justify-center mb-8">
+                <div class="logo mr-4">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Assign-FS Logo" width="80" height="80">
+                </div>
+                <div class="title text-3xl font-bold text-gray-800">Fit-Track</div>
+            </div>
+        </div>
+    </div>
+    <nav class="bg-gray-800 p-4">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <a href="/dashboard" class="text-white text-lg font-bold">Dashboard</a>
+                    <a href="/social" class="text-white text-lg font-bold ml-4">Social</a>
+                    <a href="/visualize_progress" class="text-white text-lg font-bold ml-4">Visualize Progress</a>
+                </div>
+                <div>
+                    {% if 'user' in session %}
+                    <a href="/logout" class="text-white">Logout</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <h1>Visualize Progress</h1>
+
+    <div id="activity-chart" style="width: 800px; height: 400px;"></div>
+
+    <script>
+        var activityDates = {{ activity_dates|tojson }};
+        var activityValues = {{ activity_values|tojson }};
+
+        var activityChart = {
+            x: activityDates,
+            y: activityValues,
+            type: 'scatter',
+            mode: 'lines',
+            name: 'Activity'
+        };
+
+        var layout = {
+            title: 'Activity Progress Over Time',
+            xaxis: { title: 'Date' },
+            yaxis: { title: 'Activity Value' }
+        };
+
+        Plotly.newPlot('activity-chart', [activityChart], layout);
+    </script>
+</body>
+<footer class="bg-gray-300 text-center py-4 mt-4">
+    <p class="text-gray-700">&copy; 2025 Fit-Track. All rights reserved.</p>
+</footer>
+</html>
