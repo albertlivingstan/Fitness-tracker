@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('/static/img10.jpg');
+            background-size: cover;
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+        .error-message {
+            color: #e53e3e;
+            font-size: 0.9em;
+            margin-top: 4px;
+        }
+    </style>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Confirm password match check
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            let valid = true;
+            let pwd = document.getElementById('password').value;
+            let cpwd = document.getElementById('confirm_password').value;
+            if (pwd !== cpwd) {
+                valid = false;
+                showError('confirm_password', 'Passwords do not match.');
+            } else {
+                removeError('confirm_password');
+            }
+            // Additional JS validation can be added here
+            if (!valid) {
+                e.preventDefault();
+            }
+        });
+
+        // Block non-numeric in phone
+        document.getElementById('phone').addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        function showError(fieldId, message) {
+            let field = document.getElementById(fieldId);
+            let err = field.nextElementSibling;
+            if (!err || !err.classList.contains("error-message")) {
+                err = document.createElement('div');
+                err.classList.add("error-message");
+                field.parentNode.appendChild(err);
+            }
+            err.innerText = message;
+        }
+        function removeError(fieldId) {
+            let field = document.getElementById(fieldId);
+            let err = field.nextElementSibling;
+            if (err && err.classList.contains("error-message")) {
+                err.parentNode.removeChild(err);
+            }
+        }
+    });
+    </script>
+</head>
+<body>
+<div class="card">
+    <div class="flex items-center justify-center mb-8">
+        <img src="/static/logo.png" alt="Fit-Track Logo" width="80" height="80" class="mr-4">
+        <h1 class="text-3xl font-bold text-gray-800">Fit-Track</h1>
+        <a href="/" class="text-blue-500 font-semibold ml-auto">Home</a>
+    </div>
+
+    <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Sign Up</h2>
+    <form action="/signup" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+        <div class="mb-4">
+            <label for="name" class="block text-gray-700">Name</label>
+            <input type="text" id="name" name="name" pattern="^[A-Za-z\s]{2,50}$"
+                placeholder="Enter your name"
+                title="Name must be 2-50 letters (spaces allowed)"
+                class="form-input mt-1 block w-full" required>
+        </div>
+        <div class="mb-4">
+            <label for="phone" class="block text-gray-700">Phone</label>
+            <input type="text" id="phone" name="phone" pattern="^\d{10}$"
+                maxlength="10"
+                placeholder="Enter your phone number"
+                title="Enter a 10-digit phone number"
+                class="form-input mt-1 block w-full" required>
+        </div>
+        <div class="mb-4">
+            <label for="dob" class="block text-gray-700">Date of Birth</label>
+            <input type="date" id="dob" name="dob"
+                min="1900-01-01"
+                max="2010-11-01"
+                class="form-input mt-1 block w-full" required>
+        </div>
+        <div class="mb-4">
+            <label for="email" class="block text-gray-700">Email</label>
+            <input type="email" id="email" name="email"
+                placeholder="Enter your email"
+                class="form-input mt-1 block w-full"
+                required>
+        </div>
+      <div class="mb-4 relative">
+    <label for="password" class="block text-gray-700">Password</label>
+    <input
+        type="password"
+        id="password"
+        name="password"
+        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+        title="Password must be at least 8 characters and include an uppercase letter, a lowercase letter, a number, and a special character (@$!%*?&)."
+        class="form-input mt-1 block w-full pr-10"
+        required
+    >
+    <small class="text-gray-500">
+        Example: <span class="font-mono">Test@1234</span>
+    </small>
+    <button type="button"
+        onclick="togglePassword('password', this)"
+        class="absolute right-2 top-9 text-gray-500 focus:outline-none">
+        <!-- icon/svg here -->
+    </button>
+</div>
+
+
+<div class="mb-4 relative">
+    <label for="confirm_password" class="block text-gray-700">Confirm Password</label>
+    <input type="password" id="confirm_password" name="confirm_password"
+        class="form-input mt-1 block w-full pr-10"
+        required>
+    <button type="button"
+        onclick="togglePassword('confirm_password', this)"
+        class="absolute right-2 top-9 text-gray-500 focus:outline-none">
+
+    </button>
+</div>
+
+        <div class="mb-4">
+            <label for="activity_level" class="block text-gray-700">Activity Level</label>
+            <select id="activity_level" name="activity_level" class="form-select mt-1 block w-full" required>
+                <option value="sedentary">Sedentary</option>
+                <option value="lightly_active">Lightly Active</option>
+                <option value="moderately_active">Moderately Active</option>
+                <option value="very_active">Very Active</option>
+                <option value="extra_active">Extra Active</option>
+            </select>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700">Dietary Preferences</label>
+            <div class="mt-1 grid grid-cols-2 gap-4">
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="dietary_preferences" value="vegetarian" class="form-checkbox">
+                    <span class="ml-2">Vegetarian</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="dietary_preferences" value="vegan" class="form-checkbox">
+                    <span class="ml-2">Vegan</span>
+                </label>
+            </div>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700">Health Conditions</label>
+            <div class="mt-1 grid grid-cols-2 gap-4">
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="health_conditions" value="diabetes" class="form-checkbox">
+                    <span class="ml-2">Diabetes</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="health_conditions" value="high_blood_pressure" class="form-checkbox">
+                    <span class="ml-2">High Blood Pressure</span>
+                </label>
+            </div>
+        </div>
+        <div class="mb-4">
+            <label for="weight" class="block text-gray-700">Weight (kg)</label>
+            <input type="number" id="weight" name="weight" min="20" max="300"
+                placeholder="Enter your weight" class="form-input mt-1 block w-full" required>
+        </div>
+        <div class="mb-4">
+            <label for="height" class="block text-gray-700">Height (cm)</label>
+            <input type="number" id="height" name="height" min="100" max="250"
+                placeholder="Enter your height" class="form-input mt-1 block w-full" required>
+        </div>
+        <div class="mb-4">
+            <label for="ideal_weight" class="block text-gray-700">Ideal Weight (kg)</label>
+            <input type="number" id="ideal_weight" name="ideal_weight" min="20" max="300"
+                placeholder="Enter your ideal weight" class="form-input mt-1 block w-full" required>
+        </div>
+
+        <div class="mb-4 col-span-3">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">Sign Up</button>
+            <a href="/login" class="text-blue-500 hover:underline">Already have an account? Log in</a>
+        </div>
+    </form>
+    {% if message %}
+    <p class="text-red-500 mt-2">{{ message }}</p>
+    {% endif %}
+</div>
+</body>
+</html>

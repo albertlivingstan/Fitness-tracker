@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Dashboard | Fit-Track</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/all.min.css" rel="stylesheet">
+</head>
+
+<style>
+    html, body {
+        height: 100%;
+        scroll-behavior: smooth;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+        background: linear-gradient(to right, #f8fafc, #f1f5f9);
+    }
+
+    main {
+        flex: 1;
+        animation: fadeIn 1s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.15);
+    }
+</style>
+
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-green-400 via-blue-500 to-indigo-600 py-8">
+        <div class="container mx-auto px-4 flex items-center justify-center">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Fit-Track Logo" class="w-16 h-16 mr-4 rounded-full shadow-md">
+            <h1 class="text-4xl font-extrabold text-white tracking-wide">Fit-Track Progress</h1>
+        </div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="bg-gray-800 p-4 shadow-lg">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div>
+                <a href="/dashboard" class="text-white font-semibold hover:text-green-400 transition">Dashboard</a>
+                <a href="/social" class="text-white font-semibold hover:text-green-400 ml-6 transition">Social</a>
+                <a href="/visualize_progress" class="text-white font-semibold hover:text-green-400 ml-6 transition">Visualize Progress</a>
+            </div>
+            {% if 'user' in session %}
+            <a href="/logout" class="bg-red-500 px-4 py-2 rounded-md text-white hover:bg-red-600 transition">Logout</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Main Dashboard Section -->
+    <main class="container mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+        <!-- Activity Card -->
+        <div class="card bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl shadow-lg p-6">
+            <div class="flex items-center mb-4">
+                <i class="fa-solid fa-person-walking text-blue-600 text-3xl mr-3"></i>
+                <h2 class="text-2xl font-semibold text-gray-800">Activity</h2>
+            </div>
+            <canvas id="activityChart" height="180"></canvas>
+        </div>
+
+        <!-- Exercise Card -->
+        <div class="card bg-gradient-to-br from-green-50 to-green-100 rounded-xl shadow-lg p-6">
+            <div class="flex items-center mb-4">
+                <i class="fa-solid fa-dumbbell text-green-600 text-3xl mr-3"></i>
+                <h2 class="text-2xl font-semibold text-gray-800">Exercise</h2>
+            </div>
+            <canvas id="exerciseChart" height="180"></canvas>
+        </div>
+
+        <!-- Nutrition Card -->
+        <div class="card bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl shadow-lg p-6">
+            <div class="flex items-center mb-4">
+                <i class="fa-solid fa-apple-whole text-yellow-600 text-3xl mr-3"></i>
+                <h2 class="text-2xl font-semibold text-gray-800">Nutrition</h2>
+            </div>
+            <canvas id="nutritionChart" height="180"></canvas>
+        </div>
+
+        <!-- Goals Card -->
+        <div class="card bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl shadow-lg p-6">
+            <div class="flex items-center mb-4">
+                <i class="fa-solid fa-bullseye text-pink-600 text-3xl mr-3"></i>
+                <h2 class="text-2xl font-semibold text-gray-800">Goals</h2>
+            </div>
+            <canvas id="goalChart" height="180"></canvas>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white text-center py-4">
+        <p class="text-sm">&copy; 2025 Fit-Track | Designed by Albert Livingstan G</p>
+    </footer>
+
+    <!-- Chart.js Visualization Script -->
+    <script>
+        const activityCtx = document.getElementById('activityChart').getContext('2d');
+        const exerciseCtx = document.getElementById('exerciseChart').getContext('2d');
+        const nutritionCtx = document.getElementById('nutritionChart').getContext('2d');
+        const goalCtx = document.getElementById('goalChart').getContext('2d');
+
+        // Sample data from Flask (ensure these are passed in Python)
+        const activityData = {{ progress.activity_data | tojson | safe }};
+        const exerciseData = {{ progress.exercise_data | tojson | safe }};
+        const nutritionData = {{ progress.nutrition_data | tojson | safe }};
+        const goalData = {{ progress.goal_data | tojson | safe }};
+        const labels = {{ progress.labels | tojson | safe }};
+
+        new Chart(activityCtx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Steps Walked',
+                    data: activityData,
+                    backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                    borderColor: '#2563eb',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            }
+        });
+
+        new Chart(exerciseCtx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Exercise (minutes)',
+                    data: exerciseData,
+                    backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                    borderColor: '#10b981',
+                    borderWidth: 2
+                }]
+            }
+        });
+
+        new Chart(nutritionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Protein', 'Carbs', 'Fats'],
+                datasets: [{
+                    data: nutritionData,
+                    backgroundColor: ['#facc15', '#f59e0b', '#f87171'],
+                }]
+            }
+        });
+
+        new Chart(goalCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Steps', 'Workout', 'Calories', 'Sleep', 'Hydration'],
+                datasets: [{
+                    label: 'Goal Progress (%)',
+                    data: goalData,
+                    backgroundColor: 'rgba(236, 72, 153, 0.3)',
+                    borderColor: '#ec4899',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#ec4899'
+                }]
+            }
+        });
+    </script>
+</body>
+</html>

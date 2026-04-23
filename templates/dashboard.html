@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fit-Track Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    body { background: #f7fafc; font-family:'Montserrat',sans-serif; }
+    nav {
+      background: #1c366b;
+      color: #fff;
+      box-shadow:0 1px 8px #a7b4cb25;
+      position: sticky; top: 0; z-index:10;
+    }
+    .nav-flex { 
+      max-width: 1400px; 
+      margin: 0 auto; 
+      padding:1.6em 2em;
+      display: flex; align-items: center; 
+    }
+    .nav-logo {
+      display:flex; align-items:center; gap:.75em; font-size:2em; font-weight:800; color:#1A73E8;
+    }
+    .nav-logo img {width:48px; height:48px; border-radius:50%; box-shadow:0 0 7px #1A73E822;}
+    .nav-links {margin-left:2em; display:flex; gap:2.5em; font-weight:700;}
+    .nav-links a {color:#e4f1fb; text-decoration:none; font-size:1.13em; border-radius:.42em; padding:0.18em 0.56em;}
+    .nav-links a.active, .nav-links a:hover {background:#2563eb;color:#fff;}
+    .logout-btn {margin-left:auto; background:#2563eb; color:#fff; font-weight:700; padding:.57em 2em; border-radius:.4em;}
+    .logout-btn:hover {background:#134dab;}
+    main {max-width:1280px; margin:3.8em auto 0 auto;}
+    .headline-section {text-align:center;margin-bottom:2.9em;}
+    .headline {font-size:2.25em;font-weight:900;letter-spacing:.03em;color:#1c366b;}
+    .subtitle {color:#5977a1;font-size:1.09em;}
+    .card-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2.4em;}
+    .feat-card {border-radius:16px;background:#fff;box-shadow:0 8px 32px #adc7e925;display:flex;flex-direction:column;padding:0; border:1.5px solid #e6eefb;transition:box-shadow .17s,transform .13s;}
+    .feat-card:hover {box-shadow:0 16px 44px #2563eb26; transform:scale(1.031);}
+    .card-img-top {width:100%;height:140px;object-fit:cover;border-radius:16px 16px 0 0;}
+    .card-content {padding:2.1em 1.55em 2em 1.6em; flex:1;display:flex;flex-direction:column;}
+    .feat-title {color: #18396c; font-size:1.39em; font-weight:900; margin:.6em 0 .55em 0;}
+    .feat-desc {color:#3b6895; font-size:1.13em; margin-bottom:1.1em;}
+    .feat-card a {color:#2563eb; font-weight:800; text-decoration:none; font-size:1.09em;}
+    .feat-card a:hover {color:#099989;}
+    .quick-action-title {color:#1c366b;font-size:1.16em;font-weight:900;letter-spacing:.09em;margin-top:2.1em;margin-bottom:1.3em;padding-left:.3em;}
+    .quick-cards {display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:1.15em; margin-bottom:3em;}
+    .quick-card {border-radius:.72em;background:#f1f7fd; padding:1.03em .9em 1.3em 1.1em; box-shadow:0 8px 28px #2563eb08,0 1.5px 12px #2278fd11; border:1.1px solid #e3effb; color:#18526c;text-align:left; transition:box-shadow .14s, background .12s;}
+    .quick-card i {margin-right:.54em; color:#1A73E8;}
+    .quick-card:hover { background:#e1effd; color:#125c6e;box-shadow:0 15px 34px #60d6c51c;}
+    .quick-card a {color:#2563eb; font-weight:700; text-decoration:underline; transition:color .13s;}
+    .quick-card a:hover {color:#14b8a6;}
+    .reminder-form {background:#fff; border-radius:1.1em; box-shadow:0 6px 21px #8bb6e999; padding:2em 2em 1.6em 2em; max-width:540px; margin:2.5em auto 1em auto; border:1.18px solid #eaf3ff; display:flex;flex-direction:column;gap:1.13em;}
+    .reminder-form label {font-weight:700;font-size:1.1em;color:#2563eb;}
+    .reminder-form input[type="time"], .reminder-form select {background:#eaf3ff;color:#2563eb;border-radius:.44em;border:1.04px solid #d3e9fc;padding:.56em 1.07em;margin-top:.22em;font-size:1em;}
+    .reminder-form input[type="checkbox"] {accent-color:#2563eb;margin-right:.2em;margin-top:.18em;transform:scale(1.11);}
+    .reminder-form button { background:#2563eb;color:#fff;font-weight:800;letter-spacing:.03em;border:none;border-radius:.67em;margin-top:1.13em;padding:.85em 2.1em;font-size:1.07em;box-shadow:0 1.5px 9px #2563eb17;transition:background .13s,transform .12s;}
+    .reminder-form button:hover {background:#174aca;}
+    footer {color:#667592;text-align:center;font-size:.99em;padding:2.9em 0 1em 0;}
+    @media (max-width:1050px){main{padding:0 2vw;}}
+    @media (max-width:600px){.card-grid,.quick-cards{grid-template-columns:1fr!important;}}
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-flex">
+      <span class="nav-logo"><img src="{{ url_for('static', filename='logo.png') }}" alt="Fit-Track">Fit-Track</span>
+      <div class="nav-links">
+        <a href="/dashboard" class="active">Dashboard</a>
+        <a href="/social">Social</a>
+        <a href="/progress">Progress</a>
+        <a href="/recommendations">Recommendations</a>
+      </div>
+      <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+  </nav>
+  <main>
+    <div class="headline-section">
+      <div class="headline">Welcome to Your Dashboard</div>
+      <div class="subtitle">Level up your fitness journey with clear, professional metrics and fast access to your essentials.</div>
+    </div>
+    <div class="card-grid">
+      <div class="feat-card">
+        <img src="{{ url_for('static', filename='prgressfit copy.jpg') }}" alt="Progress" class="card-img-top">
+        <div class="card-content">
+          <span class="feat-title">Your Progress</span>
+          <div class="feat-desc">View your health journey progress visually—see where you shine and spots to grow.</div>
+          <a href="/progress">View Progress</a>
+          
+        </div>
+      </div>
+      <div class="feat-card">
+        <img src="{{ url_for('static', filename='images.jpeg') }}" alt="Goals" class="card-img-top">
+        <div class="card-content">
+          <span class="feat-title">Your Goals</span>
+          <div class="feat-desc">Stay on top of your customized health targets. Focus makes progress possible.</div>
+          <a href="/goals">Update Goals</a>
+        </div>
+      </div>
+      <div class="feat-card">
+        <img src="{{ url_for('static', filename='profile.jpg') }}" alt="Profile" class="card-img-top">
+        <div class="card-content">
+          <span class="feat-title">Profile</span>
+          <div class="feat-desc">View and edit your personal information for tailored recommendations.</div>
+          <a href="/profile">Edit Profile</a>
+        </div>
+      </div>
+      <div class="feat-card">
+        <img src="{{ url_for('static', filename='recom.jpg') }}" alt="Recommendations" class="card-img-top">
+        <div class="card-content">
+          <span class="feat-title">Recommendations</span>
+          <div class="feat-desc">Get fresh fitness and wellness suggestions created just for you.</div>
+          <a href="/recommendations">View Recommendations</a>
+        </div>
+      </div>
+    </div>
+    <div class="quick-action-title">Quick Actions</div>
+    <div class="quick-cards">
+      <div class="quick-card">
+        <div class="font-bold text-lg mb-1"><i class="fa-solid fa-shoe-prints"></i> Activity</div>
+        <div class="mb-1">Log your daily activities here.</div>
+        <a href="/activity">Log Activity</a>
+      </div>
+      <div class="quick-card">
+        <div class="font-bold text-lg mb-1"><i class="fa-solid fa-dumbbell"></i> Exercise</div>
+        <div class="mb-1">Keep track of your exercise routine.</div>
+        <a href="/exercise">Log Exercise</a>
+      </div>
+      <div class="quick-card">
+        <div class="font-bold text-lg mb-1"><i class="fa-solid fa-apple-whole"></i> Nutrition</div>
+        <div class="mb-1">Record your daily nutrition intake.</div>
+        <a href="/nutrition">Log Nutrition</a>
+      </div>
+    </div>
+    <form action="/reminder_call" method="post" class="reminder-form">
+      <div class="font-bold text-xl mb-1">Schedule a Reminder Call</div>
+      <div>
+        <label>Select reminder days:</label>
+        <div style="margin-bottom:.89em;">
+          <label><input type="checkbox" name="days" value="Monday" /> Monday</label>
+          <label><input type="checkbox" name="days" value="Tuesday" /> Tuesday</label>
+          <label><input type="checkbox" name="days" value="Wednesday" /> Wednesday</label>
+          <label><input type="checkbox" name="days" value="Thursday" /> Thursday</label>
+          <label><input type="checkbox" name="days" value="Friday" /> Friday</label>
+          <label><input type="checkbox" name="days" value="Saturday" /> Saturday</label>
+          <label><input type="checkbox" name="days" value="Sunday" /> Sunday</label>
+        </div>
+      </div>
+      <label>Set reminder time:</label>
+      <input type="time" name="reminder_time" required />
+      <label>Reminder for:</label>
+      <select name="reminder_type" required>
+        <option value="Exercise">Exercise</option>
+        <option value="Meditation">Meditation</option>
+        <option value="Nutrition">Take Nutrition</option>
+        <option value="Drinking Water">Drink Water</option>
+      </select>
+      <button type="submit"><i class="fa-solid fa-phone-volume"></i> &nbsp;Send Reminder Call</button>
+    </form>
+  </main>
+  <footer>&copy; 2025 Fit-Track &bull; Professional Dashboard</footer>
+</body>
+</html>

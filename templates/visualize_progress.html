@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fit-Track | Visual Progress</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css">
+    <style>
+        body {
+            background: linear-gradient(120deg,#f5f7fa,#c3cfe2);
+            min-height: 100vh;
+        }
+        .tracker-card {
+            background: #fff;
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 24px rgba(60, 60, 120, 0.10), 0 1.5px 3px rgba(60, 60, 120, 0.09);
+            padding: 2.5rem;
+            max-width: 900px;
+            margin: 32px auto;
+        }
+        .metric-button {
+            background: linear-gradient(90deg,#6366f1 70%,#8b5cf6 100%);
+            color: #fff;
+            border-radius: 9999px;
+            padding: 0.45rem 1.5rem;
+            font-size: 1.08rem;
+            box-shadow: 0 1.5px 7px rgba(60,60,120,0.08);
+            border: none;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            transition: box-shadow .13s, transform .13s;
+            cursor: pointer;
+        }
+        .metric-button.active, .metric-button:focus {
+            box-shadow: 0 2px 13px rgba(99,102,241,0.13);
+            transform: scale(1.08);
+        }
+    </style>
+</head>
+<body>
+    <nav class="bg-gray-800 p-4 shadow-md">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Fit-Track Logo" width="44" height="44" class="rounded-xl mr-3 shadow-md">
+                <span class="text-2xl font-extrabold text-white tracking-wide">Fit-Track</span>
+            </div>
+            <div>
+                <a href="/dashboard" class="text-gray-200 hover:text-white text-lg font-bold mr-5">Dashboard</a>
+                <a href="/social" class="text-gray-200 hover:text-white text-lg font-bold mr-5">Social</a>
+                <a href="/visualize_progress" class="text-indigo-400 text-lg font-bold underline">Progress</a>
+                {% if 'user' in session %}
+                <a href="/logout" class="ml-8 px-4 py-2 rounded-lg text-gray-100 bg-indigo-600 hover:bg-indigo-800 hover:text-white font-bold transition shadow-sm">Logout</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <section class="tracker-card">
+        <h1 class="text-center text-4xl text-gray-800 mb-7 font-extrabold">Your Progress Over Time</h1>
+        <div class="flex justify-center mb-7 flex-wrap">
+            <button class="metric-button active" data-metric="steps">Steps</button>
+            <button class="metric-button" data-metric="workouts">Workouts</button>
+            <button class="metric-button" data-metric="calories">Calories Burned</button>
+            <button class="metric-button" data-metric="nutrition">Nutrition</button>
+        </div>
+        <div id="activity-chart" style="width:100%;max-width:800px;height:420px;margin:0 auto 24px auto;"></div>
+    </section>
+
+    <footer class="bg-gray-800 text-center py-4 mt-8">
+        <p class="text-gray-200">&copy; 2025 Fit-Track. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Demo data: replace with your backend fetch or AJAX call
+        const activityData = {
+            dates: ['2025-10-29','2025-10-30','2025-10-31','2025-11-01','2025-11-02'],
+            steps:    [8200, 10400, 9900, 11200, 9700],
+            workouts: [1,    2,     1,    1,     2],
+            calories: [310,  420,   380,  450,   290],
+            nutrition:[62,   70,    66,   74,    66]
+        };
+
+        function drawChart(metric) {
+            let yData = activityData[metric];
+            let colors = {
+                steps:    '#6366f1',
+                workouts: '#4ade80',
+                calories: '#fdba74',
+                nutrition:'#f472b6'
+            };
+            Plotly.newPlot('activity-chart', [{
+                x: activityData.dates,
+                y: yData,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: metric.charAt(0).toUpperCase()+metric.slice(1),
+                marker: { color: colors[metric] }
+            }], {
+                paper_bgcolor: '#f5f7fa',
+                plot_bgcolor: '#e7ebef',
+                title: `${metric.charAt(0).toUpperCase()+metric.slice(1)} Progress`,
+                titlefont: { size: 22, color: '#3b3b4e', family: 'Inter,Helvetica,sans-serif'},
+                xaxis: { title: 'Date', gridcolor:'#c3d1e1', tickfont:{size:16,color:'#53536a'} },
+                yaxis: { title: metric.charAt(0).toUpperCase()+metric.slice(1), gridcolor:'#c3d1e1', tickfont:{size:16,color:'#53536a'} },
+                margin: { t: 72, l: 60, r: 40, b: 70 },
+                font: { family: 'Inter,Helvetica,sans-serif', size:16, color:'#575778' }
+            },{responsive:true});
+        }
+        document.querySelectorAll('.metric-button').forEach(btn => {
+            btn.onclick = function(){
+                document.querySelectorAll('.metric-button').forEach(b=>b.classList.remove('active'));
+                this.classList.add('active');
+                drawChart(this.getAttribute('data-metric'));
+            }
+        });
+        drawChart('steps'); // Initial chart
+    </script>
+</body>
+</html>

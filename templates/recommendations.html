@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fit-Track | Recommendations</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(120deg,#f5f7fa,#c3cfe2); }
+        .card {
+            background: #fff;
+            border-radius: 1.25rem;
+            box-shadow: 0 8px 24px rgba(60,60,120,.08), 0 1.5px 3px rgba(60,60,120,0.09);
+            padding: 1.7rem;
+        }
+        .music-section {
+            background: #f7f8fa;
+            border-radius: 1rem;
+            box-shadow: 0 3px 12px rgba(60,60,120,0.08);
+            padding: 1.2rem;
+            margin-bottom: 2rem;
+        }
+        .music-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #6366f1;
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+        .spotify-embed {
+            width: 100%;max-width: 420px;height: 70px;margin: 0.5rem auto;border-radius: 8px;display: block;
+        }
+        .quote-box {
+            background: linear-gradient(90deg,#6366f1 60%,#8b5cf6 100%);
+            color: #fff;
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(60,60,120,0.08);
+            text-align: center;
+            font-size: 1.12rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="bg-gray-800 p-4 shadow-md">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Fit-Track Logo" width="44" height="44" class="rounded-xl mr-3 shadow-md">
+                <span class="text-2xl font-extrabold text-white tracking-wide">Fit-Track</span>
+            </div>
+            <div>
+                <a href="/dashboard" class="text-gray-200 hover:text-white text-lg font-bold mr-5 transition-colors">Dashboard</a>
+                <a href="/social" class="text-gray-200 hover:text-white text-lg font-bold mr-5 transition-colors">Social</a>
+                <a href="/visualize_progress" class="text-gray-200 hover:text-white text-lg font-bold mr-5 transition-colors">Progress</a>
+                <a href="/recommendations" class="text-indigo-400 text-lg font-bold underline transition-colors">Recommendations</a>
+                {% if 'user' in session %}
+                <a href="/logout" class="ml-8 px-4 py-2 rounded-lg text-gray-100 bg-indigo-600 hover:bg-indigo-800 hover:text-white font-bold transition-colors shadow-sm">Logout</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="max-w-3xl mx-auto px-4 mt-8">
+        <h1 class="text-3xl font-extrabold text-gray-800 mb-6 text-center">Personalized Recommendations</h1>
+        
+        <!-- Motivational Quote -->
+        <div id="motivational-quote" class="quote-box">Push yourself, because no one else is going to do it for you.</div>
+        <div class="text-center mb-8">
+            <button onclick="showRandomQuote()" class="bg-indigo-500 hover:bg-indigo-700 text-white font-semibold py-1.5 px-5 rounded shadow transition">New Quote</button>
+        </div>
+
+
+        <!-- Recommendations List -->
+        <div class="card mb-8">
+            <h2 class="text-xl font-semibold text-indigo-700 mb-4">Your Fitness Recommendations</h2>
+            <ul class="list-disc ml-7 text-gray-700">
+                {% for rec in recommendations %}
+                    <li>{{ rec }}</li>
+                {% else %}
+                    <li>No recommendations yet! Log more data for a personalized plan.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Quick Wellness Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+            <div class="card">
+                <div class="font-bold text-green-700 mb-2">Nutrition Tip</div>
+                <p class="text-gray-800">Add more fiber and protein to your lunch for lasting energy.</p>
+            </div>
+            <div class="card">
+                <div class="font-bold text-indigo-700 mb-2">Today's Challenge</div>
+                <p class="text-gray-800">Try 15 push-ups, 20 squats, and a 1-min plank.</p>
+            </div>
+            <div class="card">
+                <div class="font-bold text-blue-700 mb-2">Mental Wellness</div>
+                <p class="text-gray-800">Take 10 minutes for guided breathing or meditation.</p>
+            </div>
+            <div class="card">
+                <div class="font-bold text-yellow-700 mb-2">Hydration Reminder</div>
+                <p class="text-gray-800">Drink a glass of water every 2 hours today.</p>
+            </div>
+        </div>
+
+        <!-- Music Recommendation Sections -->
+        <div class="music-section">
+            <div class="music-title">🏋️ Motivational Workout Music</div>
+            <iframe class="spotify-embed" src="https://open.spotify.com/embed/playlist/37i9dQZF1DWUVpAXiEPK8P" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+        </div>
+        <div class="music-section">
+            <div class="music-title">🧘 Meditation & Mindfulness</div>
+            <iframe class="spotify-embed" src="https://open.spotify.com/embed/playlist/1dQgn9kH6mQmG4peCgVDzF" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+        </div>
+
+        <!-- Share Button -->
+        <div class="text-center mt-10 mb-1">
+            <button class="bg-indigo-600 hover:bg-indigo-800 text-white font-bold py-2 px-6 rounded shadow transition"
+                onclick="shareRec()">Share Recommendations</button>
+        </div>
+        <script>
+        function shareRec() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My Fit-Track Recommendations',
+                    text: 'Check out my personalized fitness recommendations!',
+                    url: window.location.href
+                });
+            } else {
+                alert('Sharing is not supported on your browser.');
+            }
+        }
+
+        // Motivational Quotes Array
+        const quotes = [
+            "Push yourself, because no one else is going to do it for you.",
+            "Success comes after you stop making excuses.",
+            "Strength: overcoming what you thought you couldn’t.",
+            "Every effort matters.",
+            "Don’t limit your challenges–challenge your limits!",
+            "Nothing will work unless you do.",
+            "Don’t have to be extreme, just consistent.",
+            "Progress–not perfection.",
+            "Wake up with determination, sleep with satisfaction.",
+            "The only bad workout is the one you didn’t do."
+        ];
+        function showRandomQuote() {
+            const idx = Math.floor(Math.random() * quotes.length);
+            document.getElementById('motivational-quote').innerText = quotes[idx];
+        }
+        </script>
+
+    </main>
+    <footer class="bg-gray-800 text-center py-4 mt-8">
+        <p class="text-gray-200">&copy; 2025 Fit-Track. All rights reserved.</p>
+    </footer>
+</body>
+</html>
